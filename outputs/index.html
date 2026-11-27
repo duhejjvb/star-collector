@@ -9,14 +9,145 @@
 .orb:focus-visible,.btn:focus-visible,.sound:focus-visible{outline:3px solid #785e96;outline-offset:4px}.sound[aria-pressed="false"]{opacity:.7}@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style></head><body><div class="sky"></div><main class="app"><header class="top"><div class="brand">✦ LITTLE DAYDREAM ✦</div><button class="sound" id="sound" type="button" aria-label="關閉音效" aria-pressed="true">♪</button></header><section class="heading"><h1>星星收集社</h1><p>趁微風把星星都收進口袋吧</p></section><section class="stats"><div class="stat"><small>星星</small><b id="score" aria-live="polite" aria-atomic="true">0</b></div><div class="stat"><small>剩餘時間</small><b><span id="time">30</span><small style="display:inline;font-size:13px;letter-spacing:0"> 秒</small></b></div><div class="stat"><small>最佳紀錄</small><b id="best">0</b></div></section><section class="arena" id="arena" aria-label="遊戲區"><div class="ground"></div><div class="toast" id="toast">好棒！</div><div class="overlay" id="overlay"><div class="card"><span class="hero" id="hero">🌙</span><h2 id="ovtitle">準備好收集星星了嗎？</h2><p id="ovcopy">點擊或輕觸飄過的小星星，<br>金色星星有雙倍分數喔！<br>鍵盤可用 Tab 選取，再按 Enter。</p><button class="btn" id="start">開始收集</button></div></div></section><footer class="footer">輕輕點一下星星 · 金星 +2 ✨</footer></main>
 <script>
-const arena=document.querySelector('#arena'), scoreEl=document.querySelector('#score'),timeEl=document.querySelector('#time'),bestEl=document.querySelector('#best'),overlay=document.querySelector('#overlay');let score=0,time=30,running=false,spawnTimer,tickTimer,soundOn=true,audio;
-function readBest(){try{let value=Number(localStorage.getItem('starBest'));return Number.isFinite(value)&&value>0?value:0}catch{return 0}}
-function saveBest(value){try{localStorage.setItem('starBest',String(value))}catch{}}
-bestEl.textContent=readBest();
-function beep(freq=660,dur=.08){if(!soundOn)return;try{audio=audio||new(window.AudioContext||window.webkitAudioContext)();let o=audio.createOscillator(),g=audio.createGain();o.connect(g);g.connect(audio.destination);o.frequency.value=freq;g.gain.setValueAtTime(.08,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+dur);o.start();o.stop(audio.currentTime+dur)}catch{}}
-function toast(msg){let t=document.querySelector('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),550)}
-function spawn(){if(!running)return;let gold=Math.random()<.2,emojis=gold?['🌟','💫']:['⭐','✨','🌟','💛','🩷','🌼'];let b=document.createElement('button');b.className='orb';b.setAttribute('aria-label',gold?'收集金色星星':'收集星星');b.innerHTML='<span>'+emojis[Math.floor(Math.random()*emojis.length)]+'</span>';let size=gold?48:40;b.style.fontSize=size+'px';b.style.left=(8+Math.random()*77)+'%';b.style.top=(12+Math.random()*64)+'%';b.style.animationDelay=(-Math.random())+'s';b.onclick=()=>{if(!running)return;score+=gold?2:1;scoreEl.textContent=score;beep(gold?940:660);if(score%10===0)toast('太厲害了！連續收集 ✨');b.classList.add('pop');setTimeout(()=>b.remove(),220)};arena.appendChild(b);setTimeout(()=>b.remove(),2400)}
-function start(){score=0;time=30;running=true;scoreEl.textContent=0;timeEl.textContent=30;overlay.classList.add('hidden');arena.querySelectorAll('.orb').forEach(x=>x.remove());spawn();spawnTimer=setInterval(spawn,690);tickTimer=setInterval(()=>{time--;timeEl.textContent=time;if(time<=0)finish()},1000)}
-function finish(){running=false;clearInterval(spawnTimer);clearInterval(tickTimer);arena.querySelectorAll('.orb').forEach(x=>x.remove());let best=readBest();if(score>best){best=score;saveBest(best);bestEl.textContent=best}document.querySelector('#hero').textContent=score>=25?'🏆':'🌙';document.querySelector('#ovtitle').textContent=score>=25?'星星大師！':'今天也收穫滿滿';document.querySelector('#ovcopy').innerHTML=`你收集了 <b>${score}</b> 顆星星<br>${score>0?'再來一局，看看能不能更多？':'下次一定會收集到更多喔！'}`;document.querySelector('#start').textContent='再玩一次';overlay.classList.remove('hidden');beep(520,.15)}
-document.querySelector('#start').onclick=start;document.querySelector('#sound').onclick=e=>{soundOn=!soundOn;e.currentTarget.textContent=soundOn?'♪':'♫̸';e.currentTarget.setAttribute('aria-pressed',String(soundOn));e.currentTarget.setAttribute('aria-label',soundOn?'關閉音效':'開啟音效');if(soundOn)beep()};
+const arena = document.querySelector('#arena');
+const scoreEl = document.querySelector('#score');
+const timeEl = document.querySelector('#time');
+const bestEl = document.querySelector('#best');
+const overlay = document.querySelector('#overlay');
+
+let score = 0;
+let time = 30;
+let running = false;
+let soundOn = true;
+let audio;
+let deadline = 0;
+let spawnTimer;
+let tickTimer;
+
+function readBest() {
+  try {
+    const value = Number(localStorage.getItem('starBest'));
+    return Number.isFinite(value) && value > 0 ? value : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function saveBest(value) {
+  try {
+    localStorage.setItem('starBest', String(value));
+  } catch {}
+}
+
+bestEl.textContent = readBest();
+
+function beep(freq = 660, duration = 0.08) {
+  if (!soundOn) return;
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audio.createOscillator();
+    const gain = audio.createGain();
+    oscillator.connect(gain);
+    gain.connect(audio.destination);
+    oscillator.frequency.value = freq;
+    gain.gain.setValueAtTime(0.08, audio.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + duration);
+    oscillator.start();
+    oscillator.stop(audio.currentTime + duration);
+  } catch {}
+}
+
+function toast(message) {
+  const element = document.querySelector('#toast');
+  element.textContent = message;
+  element.classList.add('show');
+  setTimeout(() => element.classList.remove('show'), 550);
+}
+
+function spawn() {
+  if (!running || document.visibilityState === 'hidden') return;
+  const gold = Math.random() < 0.2;
+  const choices = gold ? ['🌟', '💫'] : ['⭐', '✨', '🌟', '💛', '🩷', '🌼'];
+  const orb = document.createElement('button');
+  orb.className = 'orb';
+  orb.type = 'button';
+  orb.setAttribute('aria-label', gold ? '收集金色星星' : '收集星星');
+  orb.innerHTML = `<span>${choices[Math.floor(Math.random() * choices.length)]}</span>`;
+  orb.style.fontSize = `${gold ? 48 : 40}px`;
+  orb.style.left = `${8 + Math.random() * 77}%`;
+  orb.style.top = `${12 + Math.random() * 64}%`;
+  orb.style.animationDelay = `${-Math.random()}s`;
+  orb.onclick = () => {
+    if (!running) return;
+    score += gold ? 2 : 1;
+    scoreEl.textContent = score;
+    beep(gold ? 940 : 660);
+    if (score % 10 === 0) toast('太厲害了！連續收集 ✨');
+    orb.classList.add('pop');
+    setTimeout(() => orb.remove(), 220);
+  };
+  arena.appendChild(orb);
+  setTimeout(() => orb.remove(), 2400);
+}
+
+function finish() {
+  if (!running) return;
+  running = false;
+  clearInterval(spawnTimer);
+  clearInterval(tickTimer);
+  arena.querySelectorAll('.orb').forEach(orb => orb.remove());
+
+  const previousBest = readBest();
+  const best = Math.max(previousBest, score);
+  if (score > previousBest) saveBest(best);
+  bestEl.textContent = best;
+  document.querySelector('#hero').textContent = score >= 25 ? '🏆' : '🌙';
+  document.querySelector('#ovtitle').textContent = score >= 25 ? '星星大師！' : '今天也收穫滿滿';
+  document.querySelector('#ovcopy').innerHTML = `你收集了 <b>${score}</b> 顆星星<br>${score > 0 ? '再來一局，看看能不能更多？' : '下次一定會收集到更多喔！'}`;
+  document.querySelector('#start').textContent = '再玩一次';
+  overlay.classList.remove('hidden');
+  beep(520, 0.15);
+}
+
+function updateClock() {
+  if (!running) return;
+  const remaining = Math.max(0, Math.ceil((deadline - performance.now()) / 1000));
+  if (remaining !== time) {
+    time = remaining;
+    timeEl.textContent = time;
+  }
+  if (remaining === 0) finish();
+}
+
+function start() {
+  score = 0;
+  time = 30;
+  running = true;
+  deadline = performance.now() + 30_000;
+  scoreEl.textContent = 0;
+  timeEl.textContent = 30;
+  overlay.classList.add('hidden');
+  arena.querySelectorAll('.orb').forEach(orb => orb.remove());
+  spawn();
+  spawnTimer = setInterval(spawn, 690);
+  tickTimer = setInterval(updateClock, 200);
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!running) return;
+  if (document.visibilityState === 'hidden') {
+    arena.querySelectorAll('.orb').forEach(orb => orb.remove());
+  } else {
+    updateClock();
+  }
+});
+
+document.querySelector('#start').onclick = start;
+document.querySelector('#sound').onclick = event => {
+  soundOn = !soundOn;
+  event.currentTarget.textContent = soundOn ? '♪' : '♫̸';
+  event.currentTarget.setAttribute('aria-pressed', String(soundOn));
+  event.currentTarget.setAttribute('aria-label', soundOn ? '關閉音效' : '開啟音效');
+  if (soundOn) beep();
+};
 </script></body></html>
