@@ -32,7 +32,8 @@
 - 為自訂按鈕提供 `:focus-visible` 樣式，讓鍵盤使用者知道目前選到哪裡。
 - 以 `prefers-reduced-motion: reduce` 停用漂浮、縮放等裝飾動畫，保留必要的操作回饋。
 - `localStorage` 可能因隱私模式、瀏覽器政策或檔案來源限制而讀寫失敗。對讀取和寫入分別使用 `try/catch`，驗證讀回值，再把儲存視為可選功能，避免它阻止主要遊戲啟動。
-- 對可選的音效開關同步更新 `aria-pressed` 與狀態標籤，避免只有圖示變化。`n- 不要用 `user-scalable=no` 或 `maximum-scale=1` 鎖住縮放；窄螢幕或橫向畫面高度不足時，允許頁面垂直捲動。
+- 對可選的音效開關同步更新 `aria-pressed` 與狀態標籤，避免只有圖示變化。
+- 不要用 `user-scalable=no` 或 `maximum-scale=1` 鎖住縮放；窄螢幕或橫向畫面高度不足時，允許頁面垂直捲動。
 
 ### 本次驗收
 
