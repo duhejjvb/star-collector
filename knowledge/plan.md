@@ -17,7 +17,7 @@
 
 ### 目前狀態
 
-**可遊玩的第一版已完成，GitHub Pages 已設定由 Actions 發布。** 遊戲程式、公開倉庫與部署 workflow 都已就緒；目前正等待首次 workflow 執行並確認線上頁面可用。尚未完成跨瀏覽器或裝置驗收。
+**第一版已透過 GitHub Pages 上線。** Actions 部署工作成功，正式網址回應 HTTP 200 並提供遊戲 HTML。接下來進行桌面與手機的實際遊玩驗收，再依體驗調整互動與節奏。
 
 ### 已完成
 
@@ -31,11 +31,11 @@
 - [x] 提供觸控與滑鼠皆可操作的遊戲區。
 - [x] 建立 GitHub Actions workflow，將 `outputs/` 發布至 GitHub Pages。
 - [x] 建立公開 GitHub repository 並推送 `main`。
-- [x] 建立 GitHub Pages 網站並設定 `workflow` 發布來源。
+- [x] 建立 Pages 網站並設定 Actions 發布來源。
+- [x] 確認 Actions 部署成功，正式網址回應 HTTP 200。
 
 ### 剩餘項目
 
-- [ ] 確認首次 GitHub Actions 部署成功，並驗證正式網址回應遊戲頁面。
 - [ ] 在桌面與手機尺寸實際遊玩，確認版面、點擊範圍與計時表現。
 - [ ] 確認常見瀏覽器中的音效啟用與本機最佳紀錄行為。
 - [ ] 依實際遊玩感受調整星星生成速度、大小與金星出現率。
