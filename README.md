@@ -15,3 +15,8 @@ GitHub Pages：<https://duhejjvb.github.io/star-collector/>
 每次推送到 `main` 後，GitHub Actions 會自動將 `outputs/` 發布到 GitHub Pages。workflow 設定位於 `.github/workflows/pages.yml`。若複製到新 repository，請先在 **Settings → Pages → Build and deployment** 將來源設成 **GitHub Actions**。
 
 遊戲原始檔位於 `outputs/index.html`；規劃文件位於 `knowledge/plan.md`，可重用的實作經驗位於 `knowledge/experience.md`。
+
+## 本機 smoke test
+
+安裝 Node.js 24 後執行 
+ode tests/game-smoke.cjs`。此測試不需安裝 npm 套件。
