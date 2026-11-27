@@ -18,5 +18,10 @@ GitHub Pages：<https://duhejjvb.github.io/star-collector/>
 
 ## 本機 smoke test
 
-安裝 Node.js 24 後執行 
-ode tests/game-smoke.cjs`。此測試不需安裝 npm 套件。
+安裝 Node.js 24 後執行：
+
+```sh
+node tests/game-smoke.cjs
+```
+
+測試不需安裝 npm 套件。它驗證遊戲邏輯與儲存容錯，不取代桌面或手機的實際視覺／觸控驗收。
