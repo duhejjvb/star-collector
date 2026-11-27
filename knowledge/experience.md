@@ -92,8 +92,8 @@ Node smoke test 對同一顆星星連續呼叫兩次 click handler，只增加�
 
 Node.js 內建 `vm` 可執行內嵌遊戲腳本並提供最小 DOM、計時器、音訊與儲存 mock，不需要 jsdom 或 npm 安裝。測試需明確標出模擬環境的邊界，不能將它當成版面或真機互動驗收。
 
-在 GitHub Actions 中先以 `actions/setup-node` 固定 Node 主版本，再執行 smoke test，讓失敗在部署前終止。這個專案使用 Node 24 與 `tests/game-smoke.cjs`，測試計分一次性、截止時間、visibilitychange、最佳紀錄、儲存例外和音效開關。
+在 GitHub Actions 中先以 `actions/setup-node` 固定 Node 主版本，再執行 smoke test，讓失敗在部署前終止。這個專案使用 Node 24 與 `tests/game-smoke.cjs`，測試普通星星與金星分數、單次命中、倒數截止、visibilitychange、最佳紀錄的載入與不倒退、新局重置、儲存例外和音效開關。以可控的隨機數序列分別覆蓋普通與特殊目標，避免測試只碰到其中一條隨機分支。
 
 ### 適用範圍
 
-適用於依賴少、核心邏輯可與 DOM 分開驗證的單檔互動頁面；若遊戲邏輯變複雜或高度依賴瀏覽器 API，應改用更完整的單元或瀏覽器測試工具，但保留手動視覺／觸控驗收。
+適用於依賴少、核心邏輯可與 DOM 分開驗證的單檔互動頁面；以可控輸入覆蓋不同隨機分支，也可檢查隨機遊戲中常被漏掉的普通路徑。若遊戲邏輯變複雜或高度依賴瀏覽器 API，應改用更完整的單元或瀏覽器測試工具，但保留手動視覺／觸控驗收。

@@ -13,12 +13,14 @@ assert.match(html, /min-width:44px;min-height:44px/, 'star targets should be at 
 assert.match(html, /prefers-reduced-motion:reduce/, 'decorative motion should respect reduced-motion');
 assert.doesNotMatch(html, /user-scalable=no|maximum-scale=1/, 'the viewport must remain zoomable');
 
-function createGame({ storageBlocked = false } = {}) {
+function createGame({ storageBlocked = false, initialBest = null, randomValues = [0] } = {}) {
   const elements = new Map();
   const intervals = [];
   const listeners = new Map();
   const saved = new Map();
+  if (initialBest !== null) saved.set('starBest', String(initialBest));
   let now = 0;
+  let randomIndex = 0;
 
   function element() {
     const classes = new Set();
@@ -66,7 +68,11 @@ function createGame({ storageBlocked = false } = {}) {
     ? { getItem() { throw Error('storage blocked'); }, setItem() { throw Error('storage blocked'); } }
     : { getItem: key => saved.get(key) ?? null, setItem: (key, value) => saved.set(key, value) };
   const deterministicMath = Object.create(Math);
-  deterministicMath.random = () => 0;
+  deterministicMath.random = () => {
+    const value = randomValues[randomIndex % randomValues.length];
+    randomIndex += 1;
+    return value;
+  };
 
   vm.runInNewContext(gameScript, {
     document,
@@ -88,6 +94,26 @@ function createGame({ storageBlocked = false } = {}) {
       listeners.get('visibilitychange')();
     },
   };
+}
+
+{
+  const game = createGame({ initialBest: 5, randomValues: [0.9] });
+  assert.equal(game.elements.get('#best').textContent, 5, 'a saved best should load at startup');
+  game.start();
+  const star = game.stars.find(item => item.active);
+  assert.equal(star.attrs['aria-label'], '收集星星');
+  star.onclick();
+  assert.equal(game.elements.get('#score').textContent, 1, 'a regular star should score one point');
+
+  game.setTime(30_500);
+  game.changeVisibility('visible');
+  assert.equal(game.elements.get('#best').textContent, 5, 'a lower round must not reduce the saved best');
+  assert.equal(game.saved.get('starBest'), '5');
+
+  game.start();
+  assert.equal(game.elements.get('#score').textContent, 0, 'a new round should reset the round score');
+  assert.equal(game.elements.get('#best').textContent, 5, 'a new round should retain the best record');
+  assert.equal(game.stars.filter(item => item.active).length, 1, 'a new round should start with one fresh target');
 }
 
 {
