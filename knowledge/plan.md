@@ -17,7 +17,7 @@
 
 ### 目前狀態
 
-**可遊玩的第一版已完成。** 遊戲已實作為單一 HTML 檔案，包含開始畫面、30 秒回合、星星生成與點擊計分、金星雙倍分數、結束畫面、最佳紀錄，以及可切換的簡單音效。尚未進行跨瀏覽器或裝置的完整驗收。
+**可遊玩的第一版已完成，GitHub Pages 已設定由 Actions 發布。** 遊戲程式、公開倉庫與部署 workflow 都已就緒；目前正等待首次 workflow 執行並確認線上頁面可用。尚未完成跨瀏覽器或裝置驗收。
 
 ### 已完成
 
@@ -29,19 +29,24 @@
 - [x] 使用瀏覽器本機儲存最佳紀錄。
 - [x] 加入簡單音效開關。
 - [x] 提供觸控與滑鼠皆可操作的遊戲區。
+- [x] 建立 GitHub Actions workflow，將 `outputs/` 發布至 GitHub Pages。
+- [x] 建立公開 GitHub repository 並推送 `main`。
+- [x] 建立 GitHub Pages 網站並設定 `workflow` 發布來源。
 
 ### 剩餘項目
 
+- [ ] 確認首次 GitHub Actions 部署成功，並驗證正式網址回應遊戲頁面。
 - [ ] 在桌面與手機尺寸實際遊玩，確認版面、點擊範圍與計時表現。
 - [ ] 確認常見瀏覽器中的音效啟用與本機最佳紀錄行為。
 - [ ] 依實際遊玩感受調整星星生成速度、大小與金星出現率。
-- [x] 加入 GitHub Actions workflow，將 `outputs/` 發布至 GitHub Pages。
-- [ ] 建立 GitHub 遠端 repository、推送 main 並確認 Pages 部署成功。
-- [ ] 更新此文件，補上正式遊戲頁面網址。
+
+## 正式網址
+
+- GitHub Pages：<https://duhejjvb.github.io/star-collector/>
+- GitHub repository：<https://github.com/duhejjvb/star-collector>
 
 ## 目前交付檔案
 
 - `outputs/index.html`：可直接以瀏覽器開啟的遊戲。
-
-
-
+- `.github/workflows/pages.yml`：推送到 `main` 時發布 `outputs/` 的 workflow。
+- `knowledge/experience.md`：可套用到其他專案的實作經驗。
