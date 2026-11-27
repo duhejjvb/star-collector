@@ -24,6 +24,24 @@
 
 首次部署若失敗在 `Configure Pages`，先檢查 Pages site 是否存在、來源是否為 workflow；若失敗在 `Deploy to GitHub Pages`，再檢查 `pages: write`、`id-token: write` 與 workflow environment 權限。不要只依據 workflow run 的總狀態猜測原因，應定位失敗 step。
 
+## 瀏覽器小遊戲的可用性與儲存容錯
+
+### 做法
+
+- 以原生 `<button>` 做可點擊目標，可直接取得鍵盤焦點、Enter 啟動和輔助技術語意；補上清楚的 `aria-label`。
+- 為自訂按鈕提供 `:focus-visible` 樣式，讓鍵盤使用者知道目前選到哪裡。
+- 以 `prefers-reduced-motion: reduce` 停用漂浮、縮放等裝飾動畫，保留必要的操作回饋。
+- `localStorage` 可能因隱私模式、瀏覽器政策或檔案來源限制而讀寫失敗。對讀取和寫入分別使用 `try/catch`，驗證讀回值，再把儲存視為可選功能，避免它阻止主要遊戲啟動。
+- 對可選的音效開關同步更新 `aria-pressed` 與狀態標籤，避免只有圖示變化。
+
+### 本次驗收
+
+JavaScript 內嵌程式以 `node --check` 通過語法檢查；`git diff --check` 無格式錯誤。瀏覽器實際鍵盤與減少動態效果驗收仍待桌機/手機人工操作。
+
 ### 適用範圍
 
-適用於小型靜態網站、純 HTML/CSS/JavaScript 專案，以及由子資料夾提供靜態輸出的專案。若使用 SPA 前端路由、建置工具、私有依賴或自訂網域，需額外處理 fallback、build 步驟、部署憑證或 DNS/HTTPS 設定。
+適用於小型 HTML 遊戲、互動展示，以及以本機儲存偏好或最佳成績的前端小工具。若資料屬於必須保存的使用者內容，不能只依賴 `localStorage`；應提供明確錯誤處理及更可靠的儲存方案。
+
+## 適用範圍：GitHub Pages 經驗
+
+Pages 部署經驗適用於小型靜態網站、純 HTML/CSS/JavaScript 專案，以及由子資料夾提供靜態輸出的專案。若使用 SPA 前端路由、建置工具、私有依賴或自訂網域，需額外處理 fallback、build 步驟、部署憑證或 DNS/HTTPS 設定。
