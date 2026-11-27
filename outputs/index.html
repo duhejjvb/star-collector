@@ -78,7 +78,12 @@ function spawn() {
   orb.style.top = `${12 + Math.random() * 64}%`;
   orb.style.animationDelay = `${-Math.random()}s`;
   orb.onclick = () => {
-    if (!running) return;
+    if (!running || orb.disabled) return;
+    if (performance.now() >= deadline) {
+      updateClock();
+      return;
+    }
+    orb.disabled = true;
     score += gold ? 2 : 1;
     scoreEl.textContent = score;
     beep(gold ? 940 : 660);
