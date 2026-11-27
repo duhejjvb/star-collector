@@ -11,11 +11,13 @@ new vm.Script(gameScript);
 
 assert.match(html, /min-width:44px;min-height:44px/, 'star targets should be at least 44 CSS px');
 assert.match(html, /prefers-reduced-motion:reduce/, 'decorative motion should respect reduced-motion');
+assert.match(html, /id="arena" aria-label="遊戲區" tabindex="-1"/, 'the game area should accept programmatic focus');
 assert.doesNotMatch(html, /user-scalable=no|maximum-scale=1/, 'the viewport must remain zoomable');
 
 function createGame({ storageBlocked = false, initialBest = null, randomValues = [0] } = {}) {
   const elements = new Map();
   const intervals = [];
+  const timeouts = [];
   const listeners = new Map();
   const saved = new Map();
   if (initialBest !== null) saved.set('starBest', String(initialBest));
@@ -33,6 +35,7 @@ function createGame({ storageBlocked = false, initialBest = null, randomValues =
       },
       setAttribute(name, value) { this.attrs[name] = value; },
       remove() { this.active = false; },
+      focus() { this.focused = true; },
     };
   }
 
@@ -82,11 +85,16 @@ function createGame({ storageBlocked = false, initialBest = null, randomValues =
     Math: deterministicMath,
     setInterval: callback => { intervals.push(callback); return intervals.length; },
     clearInterval() {},
-    setTimeout() {},
+    setTimeout: (callback, delay) => { timeouts.push({ callback, delay }); },
   });
 
   return {
     elements, intervals, listeners, saved, stars, document,
+    runTimeout: delay => {
+      const index = timeouts.findIndex(timer => timer.delay === delay);
+      assert.notEqual(index, -1, `a ${delay} ms timeout should be scheduled`);
+      timeouts.splice(index, 1)[0].callback();
+    },
     start: () => elements.get('#start').onclick(),
     setTime: value => { now = value; },
     changeVisibility: state => {
@@ -94,6 +102,25 @@ function createGame({ storageBlocked = false, initialBest = null, randomValues =
       listeners.get('visibilitychange')();
     },
   };
+}
+
+{
+  const game = createGame({ randomValues: [0.9] });
+  game.start();
+  game.intervals[0]();
+  const [keyboardStar, nextStar] = game.stars.filter(item => item.active);
+  keyboardStar.onclick({ detail: 0 });
+  game.runTimeout(220);
+  assert.equal(game.elements.get('#score').textContent, 1, 'keyboard activation should still score a regular star');
+  assert.equal(nextStar.focused, true, 'keyboard focus should move to another available target after collection');
+}
+
+{
+  const game = createGame({ randomValues: [0.9] });
+  game.start();
+  game.stars.find(item => item.active).onclick({ detail: 0 });
+  game.runTimeout(220);
+  assert.equal(game.elements.get('#arena').focused, true, 'the game area should receive focus when no targets remain');
 }
 
 {
