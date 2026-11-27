@@ -45,6 +45,9 @@
 - [ ] 確認常見瀏覽器中的音效啟用與最佳紀錄保存行為。
 - [ ] 依實際遊玩感受調整星星生成速度、大小與金星出現率。
 
+
+節奏調整先等待真實遊玩證據；驗收項目與推薦方式見 `knowledge/decision.md`。
+
 ## 正式網址
 
 - GitHub Pages：<https://duhejjvb.github.io/star-collector/>
@@ -55,3 +58,5 @@
 - `outputs/index.html`：可直接以瀏覽器開啟的遊戲。
 - `.github/workflows/pages.yml`：推送到 `main` 時發布 `outputs/` 的 workflow。
 - `knowledge/experience.md`：可套用到其他專案的實作經驗。
+- `knowledge/decision.md`：尚待實機操作的驗收建議。
+
